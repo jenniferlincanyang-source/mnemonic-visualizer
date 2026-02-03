@@ -28,3 +28,9 @@ npm run dev
 
 - 以太坊：`m/44'/60'/0'/0/0`
 
+
+从你这边的输出可以确认：
+提交成功：[main 4baade0] Fix: random mnemonic each click...，1 个文件改动已提交
+推送成功：b5b9d5d..4baade0 main -> main，远程 main 已更新
+GitHub 会自动用这次提交重新构建并部署到 Pages，一般 1～2 分钟内生效。过一会儿刷新这个地址就能看到“每次点击随机生成助记词并更新整条密钥链”的版本：
+https://jenniferlincanyang-source.github.io/mnemonic-visualizer/

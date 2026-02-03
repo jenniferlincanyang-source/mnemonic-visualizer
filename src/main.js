@@ -92,8 +92,9 @@ function render(state) {
       </section>
 
       <section class="action">
-        <button id="genBtn" class="genBtn">生成完整密钥链（仅用于学习，请勿用于真实资产）</button>
+        <button id="genBtn" class="genBtn">随机生成助记词并生成完整密钥链（仅用于学习，请勿用于真实资产）</button>
         <p class="disclaimer">本页面仅作教学演示，生成的内容不要用于真实钱包或存储资产。</p>
+        <p class="hint" style="margin-top:8px;">每次点击上方按钮都会生成<strong>新的随机助记词</strong>，下方熵、种子、私钥、公钥、地址等会随之更新。</p>
       </section>
 
       <section class="advanced collapse">
@@ -375,9 +376,29 @@ async function computeAll({ mnemonic, passphrase, path }) {
 }
 
 async function generateAndCompute() {
+  // 每次点击都生成全新的随机助记词（12 词），并用它重新计算整条密钥链
   const wallet = HDNodeWallet.createRandom();
-  $("#mnemonicInput").value = wallet.mnemonic.phrase;
-  await computeFromInputs();
+  const mnemonic = wallet.mnemonic.phrase;
+  const passphrase = ($("#passphraseInput")?.value || "").toString().trim();
+  const path = ($("#pathInput")?.value || "m/44'/60'/0'/0/0").toString().trim();
+
+  const entropyHex = strip0x(wallet.mnemonic.entropy);
+  const entBits = String((entropyHex.length / 2) * 8);
+  const { checksumBits } = await sha256Bits(hexToBytes(entropyHex));
+  const mnemonicWords = mnemonic.trim().split(/\s+/);
+
+  const derived = await computeAll({ mnemonic, passphrase, path });
+
+  render({
+    entropyHex,
+    entBits,
+    checksumBits,
+    mnemonic,
+    mnemonicWords,
+    passphrase,
+    path,
+    ...derived,
+  });
 }
 
 async function computeFromInputs() {
